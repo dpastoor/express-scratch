@@ -16,7 +16,7 @@ app.get('/', (req, res) =>
   })
 );
 
-app.get('/data', (req, res) => res.json(jsonData))
+app.get('/data', (req, res) => res.json(jsonData));
 
 var port = 3000;
 app.listen(port, () => console.log('listening on http://localhost:' + port));
