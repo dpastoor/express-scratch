@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/dpastoor/express-scratch/issues"
   },
-  "homepage": "https://github.com/dpastoor/express-scratch#readme"
+  "homepage": "https://github.com/dpastoor/express-scratch#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
 }
