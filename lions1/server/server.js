@@ -1,83 +1,79 @@
-// TODO: make this work.
-// if yuo go to localhost:3000 the app
-// there is expected crud to be working here
+// TODO: user app.params to find the lion using the id
+// and then attach the lion to the req object and call next. Then in
+// '/lion/:id' just send back req.lion
+
+// create a middleware function to catch and handle errors, register it
+// as the last middleware on app
+
+
+// create a route middleware for POST /lions that will increment and
+// add an id to the incoming new lion object on req.body
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var _ = require('lodash');
+var morgan = require('morgan');
 
-// express.static will serve everything with in client as a static resource
-// also, it will server the index.html on the root of that directory on a GET to '/'
+var lions = [];
+var id = 0;
+
+var updateId = function(req, res, next) {
+  // fill this out. this is the route middleware for the ids
+};
+
+app.use(morgan('dev')) // for logging
 app.use(express.static('client'));
-
-// body parser makes it possible to post JSON to the server
-// we can accss data we post on as req.body
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 /*
-what is going on with the app.use is basically
-var appMiddleware = []; (there is a stack) and every time we call app.use
-we are passing that function into the array (eg express.static('client'))
-so express.static is actually a function that returns another function
-var appMiddleware = [function(req, res, next){
+The idea behind app.param is it will run this middleware if the requested route
+has a param of id passed in (in this case lions/:id)
 
-}, , , , ]
-and it runs them in order of registration every time we have a request come in
+notice the 'id' argument - the 4th argument to app.param cb is the value associated
+with the query param so we can do processing at this step, so by the time it
+is passed to the app.get('lions/:id') it will only be given the lion of that specific
+id (eg req.lion), rather than all the lions and then have to do the processing at that step
 
-This is GLOBAL middleware and it will run every request through this regardless
-of the endpoint it is trying to hit, before it gets appropriately routed
+this will also be applied to any route with the :id query param so don't need to duplicate
+logic in your code elsewhere
 */
+app.param('id', function(req, res, next, id) {
+  // fill this out to find the lion based off the id
+  // and attach it to req.lion. Rember to call next()
+});
 
-// this is currently our 'database' of lions
-let lions = [];
-let id = 0; // we can use this as the 'id' of the lion
+app.get('/lions', function(req, res){
+  res.json(lions);
+});
 
-// TODO: make the REST routes to perform CRUD on lions
-app.get('/lions', (req, res) => res.json(lions));
-
-app.get('lions/:id', (req, res) => {
-  // all req.params.<x> will be strings so if need to store as number need to parse
-  let lion = _.find(lions, {id: req.params.id});
+app.get('/lions/:id', function(req, res){
+  // use req.lion
   res.json(lion || {});
 });
 
-app.post('/lions', (req, res) => {
-     // by the time we access req.body it is already a javascript object
-    let lion = req.body;
-    id++; // increment global id
-    lion.id = '' + id; //coerce to string
+app.post('/lions', updateId, function(req, res) {
+  var lion = req.body;
 
-    lions.push(lion);
+  lions.push(lion);
 
-    res.json(lion);
+  res.json(lion);
 });
 
-app.put('/lions/:id', (req, res) => {
-  let update = req.body;
+
+app.put('/lions/:id', function(req, res) {
+  var update = req.body;
   if (update.id) {
-      delete update.id;
+    delete update.id
   }
 
-  let lion = _.findIndex(lions, {id: req.params.id});
-  if (!lions[lion]) {
-    res.send(); // if nothing just stop don't send anything more
-  } else {
-    let updatedLion = _.assign(lions[lion], update); // this extends existing object
-    // with the new information
-    res.json(updatedLion);
-  }
-});
-
-app.delete('/lions/:id', (req, res) => {
-  let lion = _.findIndex(lions, {id: req.params.id});
-  
+  var lion = _.findIndex(lions, {id: req.params.id});
   if (!lions[lion]) {
     res.send();
   } else {
-    let deletedLion = lions[lion];
-    lions.splice(lion, 1);
-    res.json(deletedLion);
+    var updatedLion = _.assign(lions[lion], update);
+    res.json(updatedLion);
   }
 });
 
