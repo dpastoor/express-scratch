@@ -21,6 +21,23 @@ var id = 0;
 var updateId = function(req, res, next) {
 };
 
+/* to think of how the callbacks work for app.use
+var cbs = [
+  morgan,
+  express.static,
+  bp,
+  bp,
+  param,
+  [...routes],
+  err
+]
+
+so all routes are kind of like siblings in the run order, so calling next()
+will proceed to the next route in the order. So for example, if you have your err
+middleware higher in the stack, if one below it PASSES (not throws which will stop everything)
+an error and calls next it will still never actually hit the error middleware
+*/
+
 app.use(morgan('dev')) // for logging
 app.use(express.static('client'));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -81,6 +98,12 @@ app.put('/lions/:id', function(req, res) {
   } else {
     var updatedLion = _.assign(lions[lion], update);
     res.json(updatedLion);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(500).send(err);
   }
 });
 
