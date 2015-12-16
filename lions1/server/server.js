@@ -59,13 +59,25 @@ app.put('/lions/:id', (req, res) => {
       delete update.id;
   }
 
-  var lion = _.findIndex(lions, {id: req.params.id});
+  let lion = _.findIndex(lions, {id: req.params.id});
   if (!lions[lion]) {
     res.send(); // if nothing just stop don't send anything more
   } else {
     let updatedLion = _.assign(lions[lion], update); // this extends existing object
     // with the new information
     res.json(updatedLion);
+  }
+});
+
+app.delete('/lions/:id', (req, res) => {
+  let lion = _.findIndex(lions, {id: req.params.id});
+  
+  if (!lions[lion]) {
+    res.send();
+  } else {
+    let deletedLion = lions[lion];
+    lions.splice(lion, 1);
+    res.json(deletedLion);
   }
 });
 
