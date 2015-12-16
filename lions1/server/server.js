@@ -29,12 +29,24 @@ This is GLOBAL middleware and it will run every request through this regardless
 of the endpoint it is trying to hit, before it gets appropriately routed
 */
 
-
-var lions = [];
-var id = 0;
+// this is currently our 'database' of lions
+let lions = [];
+let id = 0; // we can use this as the 'id' of the lion
 
 // TODO: make the REST routes to perform CRUD on lions
+app.get('/lions', (req, res) => res.json(lions));
 
+app.get('lions/:id', (req, res) => {
+  let lion = _.find(lions, {id: req.params.id});
+  res.json(lion || {});
+});
 
+app.post('/lions', (req, res) => {
+    let lion = req.body;
+    id++;
+    lion.id = '' + id; //coerce to string
+
+    lions.push(lion);
+});
 app.listen(3000);
 console.log('on port 3000');
