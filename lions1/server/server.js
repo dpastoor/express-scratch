@@ -37,16 +37,37 @@ let id = 0; // we can use this as the 'id' of the lion
 app.get('/lions', (req, res) => res.json(lions));
 
 app.get('lions/:id', (req, res) => {
+  // all req.params.<x> will be strings so if need to store as number need to parse
   let lion = _.find(lions, {id: req.params.id});
   res.json(lion || {});
 });
 
 app.post('/lions', (req, res) => {
+     // by the time we access req.body it is already a javascript object
     let lion = req.body;
-    id++;
+    id++; // increment global id
     lion.id = '' + id; //coerce to string
 
     lions.push(lion);
+
+    res.json(lion);
 });
+
+app.put('/lions/:id', (req, res) => {
+  let update = req.body;
+  if (update.id) {
+      delete update.id;
+  }
+
+  var lion = _.findIndex(lions, {id: req.params.id});
+  if (!lions[lion]) {
+    res.send(); // if nothing just stop don't send anything more
+  } else {
+    let updatedLion = _.assign(lions[lion], update); // this extends existing object
+    // with the new information
+    res.json(updatedLion);
+  }
+});
+
 app.listen(3000);
 console.log('on port 3000');
