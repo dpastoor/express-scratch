@@ -19,7 +19,6 @@ var lions = [];
 var id = 0;
 
 var updateId = function(req, res, next) {
-  // fill this out. this is the route middleware for the ids
 };
 
 app.use(morgan('dev')) // for logging
@@ -42,6 +41,14 @@ logic in your code elsewhere
 app.param('id', function(req, res, next, id) {
   // fill this out to find the lion based off the id
   // and attach it to req.lion. Rember to call next()
+  var lion = _.find(lions, {id: id});
+
+  if (lion) {
+    req.lion = lion;
+    next();
+  } else {
+    res.send();
+  }
 });
 
 app.get('/lions', function(req, res){
