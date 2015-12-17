@@ -19,6 +19,11 @@ var lions = [];
 var id = 0;
 
 var updateId = function(req, res, next) {
+  if (!req.body.id) {
+    id++;
+    req.body.id = '' + id;
+  }
+  next();
 };
 
 /* to think of how the callbacks work for app.use
@@ -64,6 +69,10 @@ app.param('id', function(req, res, next, id) {
     req.lion = lion;
     next();
   } else {
+    // in reality would want to do some sort of better handling
+    // like sending back the appropriate error status code,
+    // or passing an error into next and let it proceed to the error handling
+    // middleware down the line
     res.send();
   }
 });
@@ -93,7 +102,7 @@ app.put('/lions/:id', function(req, res) {
   }
 
   var lion = _.findIndex(lions, {id: req.params.id});
-  if (!lions[lion]) {
+  if (!lions[lion]){
     res.send();
   } else {
     var updatedLion = _.assign(lions[lion], update);
